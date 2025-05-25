@@ -1,0 +1,13 @@
+# Python
+__pycache__/
+*.pyc
+.env
+
+# Docker
+ivy/
+*.raw
+spark-warehouse/
+tmp/
+tmp.d*
+# VS Code
+.vscode/
