@@ -1,8 +1,10 @@
-# Realtime Stock-Pipeline &nbsp;
-[![MIT License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) 
-[![Docker Hub](https://img.shields.io/badge/Docker-ready-lightgrey?logo=docker)](https://docs.docker.com/)
+# Realtime Stock-Pipeline&nbsp;
+[![MIT License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Apache 2.0](https://img.shields.io/badge/Kafka%20%7C%20Spark%20%7C%20Delta--Lake-Apache%202.0-green)](https://www.apache.org/licenses/LICENSE-2.0)
+[![PostgreSQL License](https://img.shields.io/badge/PostgreSQL-License-blue)](https://opensource.org/licenses/postgresql)
+[![Docker Compose](https://img.shields.io/badge/Docker-Compose-v2.x-lightgrey?logo=docker)](https://docs.docker.com/compose/)
 
->**Kafka × Spark Structured Streaming × Delta Lake × PostgreSQL × AWS CloudWatch**
+> **Kafka × Spark Structured Streaming × Delta Lake × PostgreSQL × AWS CloudWatch**
 > A fully-containerised data pipeline that ingests live market prices, enriches them in Spark, persists them in Delta Lake **and** PostgreSQL, and raises CloudWatch alerts when intraday price movements break configured thresholds.
 
 ---
@@ -150,9 +152,14 @@ Files currently not used in the live stack
 
 ## 🛡️ Security notes
 
-IAM policy least privilege: logs:CreateLogGroup, logs:CreateLogStream, logs:PutLogEvents, cloudwatch:PutMetricData.
-Never commit .env or any secret file. .gitignore already covers it.
-If you publish the repo, consider removing AWSCLIV2.pkg, .DS_Store and other local artefacts to keep image size & clone time small.
+* **Least-privilege IAM** – the Spark container only needs  
+  `logs:CreateLogGroup`, `logs:CreateLogStream`, `logs:PutLogEvents`,  
+  and `cloudwatch:PutMetricData`. Nothing more.  
+* **Secrets** – the `.env` file is ignored by Git (`.gitignore`) and **must never be committed**.  
+* **Docker images** – the `bitnami/spark` and `cp-kafka` images are pulled from official, trusted registries. Verify digests if your threat model requires it.  
+* **Network** – all containers talk on the default bridge network only; no host-mode or privileged containers are used.  
+* **OS patches** – base images are regularly rebuilt upstream; run `docker compose pull` periodically.  
+* **Removal of large / sensitive artefacts** – consider deleting `AWSCLIV2.pkg`, `.DS_Store`, etc., before making the repository public.
 
 ---
 
@@ -160,14 +167,3 @@ If you publish the repo, consider removing AWSCLIV2.pkg, .DS_Store and other loc
 
 **Derek Acevedo** – [GitHub](https://github.com/poloman2308) | [Linkedin](https://linkedin.com/in/derekacevedo86)
 
-```r
-
-### Why the Mermaid block failed before
-GitHub needs:
-
-1. A blank line before the ```mermaid fence.
-2. The language tag exactly `mermaid` (no extra hashes).
-3. No leading `##` heading on the same line as the fence.
-
-The snippet above satisfies all three, so the diagram should render on the repo homepage after you push.
-```
