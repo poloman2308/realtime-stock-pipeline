@@ -1,8 +1,8 @@
-# Realtime Stock-Pipeline &nbsp;[![MIT License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) [![Docker Hub](https://img.shields.io/badge/Docker-ready-lightgrey?logo=docker)](https://docs.docker.com/)
-**Kafka × Spark Structured Streaming × Delta Lake × PostgreSQL × AWS CloudWatch**
+# Realtime Stock-Pipeline &nbsp;
+[![MIT License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE) 
+[![Docker Hub](https://img.shields.io/badge/Docker-ready-lightgrey?logo=docker)](https://docs.docker.com/)
 
-![Architecture diagram](realtime_data_flow)
-
+>**Kafka × Spark Structured Streaming × Delta Lake × PostgreSQL × AWS CloudWatch**
 > A fully-containerised data pipeline that ingests live market prices, enriches them in Spark, persists them in Delta Lake **and** PostgreSQL, and raises CloudWatch alerts when intraday price movements break configured thresholds.
 
 ---
@@ -29,29 +29,31 @@ The first start downloads all images, builds the stock_producer container and cr
 
 ---
 
-```mermaid
 ## 🗺️ End-to-end flow
 
+```mermaid
 flowchart LR
-    subgraph Produce
-        P1[stock_producer.py] -->|JSON©| K[Kafka<br/>topic: stock-updates]
-    end
+  %% ---------- PRODUCER ----------
+  subgraph Produce
+    P1[stock_producer.py] -->|JSON 📈| K[Kafka<br/>topic: <b>stock-updates</b>]
+  end
 
-    subgraph Transform & Store
-        K --> S(Spark Streaming<br/>stock_streaming_with_alerts.py)
-        S -->|Delta parquet| D[Delta Lake<br/>/tmp/delta]
-        S -->|INSERT| PG[(PostgreSQL)]
-        S -->|PutMetricData| CW[(AWS CloudWatch<br/>Custom metric)]
-        S -->|PutLogEvents| LOGS[(CloudWatch Logs)]
-    end
+  %% ---------- TRANSFORM ----------
+  subgraph Transform & Store
+    K --> S(Spark Streaming<br/>stock_streaming_with_alerts.py)
+    S -->|Delta parquet| D[Delta Lake<br/>/tmp/delta]
+    S -->|INSERT| PG[(PostgreSQL)]
+    S -->|PutMetricData| CW[(CloudWatch Metrics)]
+    S -->|PutLogEvents| LOGS[(CloudWatch Logs)]
+  end
 
-    style P1 fill:#ffd,stroke:#333
-    style K  fill:#f7f7ff,stroke:#333
-    style S  fill:#cce,stroke:#333
-    style D  fill:#e0ffe0,stroke:#333
-    style PG fill:#ffe0e0,stroke:#333
-    style CW fill:#e0f0ff,stroke:#333
-    style LOGS fill:#e0f0ff,stroke:#333
+  style P1  fill:#fffbe7,stroke:#444
+  style K   fill:#f7f7ff,stroke:#444
+  style S   fill:#dde1ff,stroke:#444
+  style D   fill:#e7ffe7,stroke:#444
+  style PG  fill:#ffe7e7,stroke:#444
+  style CW  fill:#e7f5ff,stroke:#444
+  style LOGS fill:#e7f5ff,stroke:#444
 ```
 
 ---
@@ -115,21 +117,12 @@ Files currently not used in the live stack
 
 ### 1.) Tail Kafka quickly
 
-```bash
-docker exec -it $(docker compose ps -q kafka) \
-  kafka-console-consumer --bootstrap-server kafka:9092 \
-  --topic stock-updates --from-beginning --max-messages 5
-```
-
-### 2.) Spark UI
-
-Visit http://localhost:4040 while the Spark container is running to inspect DAGs, streaming progress, executors, etc.
-
-### 3.) CloudWatch
-
-Logs ➜ Log groups ➜ /realtime-stock/alerts – view every alert payload.
-Metrics ➜ All metrics ➜ Custom › RealtimeStock – inspect PriceMovePct.
-Dashboards – the JSON snippets in README show you how to pin live widgets.
+| What           | How                                                                                                                                                                                |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Tail Kafka** | <br>`docker exec -it $(docker compose ps -q kafka) \`<br>`  kafka-console-consumer --bootstrap-server kafka:9092 \`<br>`  --topic stock-updates --from-beginning --max-messages 5` |
+| **Spark UI**   | [http://localhost:4040](http://localhost:4040) (while Spark container is running)                                                                                                  |
+| **CloudWatch** | Logs ➜ `/realtime-stock/alerts`  ·  Metrics ➜ `RealtimeStock › PriceMovePct`                                                                                                       |
+| **Dashboards** | Add the two widget queries shown later in this README                                                                                                                              |
 
 ---
 
@@ -146,10 +139,12 @@ Dashboards – the JSON snippets in README show you how to pin live widgets.
 
 ## 📈 Extending the pipeline ideas
 
-S3 ↔ Delta Lake – mount an S3 bucket & switch the checkpoint / Delta path to s3a://... (with proper IAM perms and --packages io.delta:delta-storage-s3_2.12:...).
-Athena or Redshift – crawl the Delta table with Glue or auto-load into Redshift Serverless.
-SNS / Slack / Teams alerts – change put_metric_data() to also publish to SNS.
-Airflow – wrap the producer + Spark job as DAG tasks for orchestration.
+| Idea                   | Hint                                                                             |
+| ---------------------- | -------------------------------------------------------------------------------- |
+| **S3 Delta Lake**      | add `--packages io.delta:delta-storage-s3_2.12:2.4.0` & use `s3a://bucket/delta` |
+| **Slack / SNS alerts** | call `boto3.client('sns').publish()` inside `alert_and_write_to_delta()`         |
+| **Airflow DAG**        | separate producer & Spark into tasks; add back-fill DAG                          |
+| **Athena / Redshift**  | Glue crawler on S3 Delta or unload Parquet to Redshift Serverless                |
 
 ---
 
@@ -165,11 +160,14 @@ If you publish the repo, consider removing AWSCLIV2.pkg, .DS_Store and other loc
 
 **Derek Acevedo** – [GitHub](https://github.com/poloman2308) | [Linkedin](https://linkedin.com/in/derekacevedo86)
 
-```pgsql
-**Where to put the diagram image?**
+```r
 
-* The Mermaid code block above renders natively on GitHub (no PNG required).  
-* If you prefer a static PNG, export it from VS Code’s “Mermaid: Preview” and replace the code block with an `![diagram](path/to/png)` reference.
+### Why the Mermaid block failed before
+GitHub needs:
 
-Happy shipping!
+1. A blank line before the ```mermaid fence.
+2. The language tag exactly `mermaid` (no extra hashes).
+3. No leading `##` heading on the same line as the fence.
+
+The snippet above satisfies all three, so the diagram should render on the repo homepage after you push.
 ```
