@@ -4,7 +4,8 @@
 [![PostgreSQL License](https://img.shields.io/badge/PostgreSQL-License-blue)](https://opensource.org/licenses/postgresql)
 [![Docker Compose](https://img.shields.io/badge/Docker_Compose-v2.x-2496ED?logo=docker&logoColor=white)](https://docs.docker.com/compose/)
 
-> **Kafka × Spark Structured Streaming × Delta Lake × PostgreSQL × AWS CloudWatch**
+**Kafka × Spark Structured Streaming × Delta Lake × PostgreSQL × AWS CloudWatch**
+
 > A fully-containerised data pipeline that ingests live market prices, enriches them in Spark, persists them in Delta Lake **and** PostgreSQL, and raises CloudWatch alerts when intraday price movements break configured thresholds.
 
 ---
