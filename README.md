@@ -2,8 +2,7 @@
 [![MIT License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Apache 2.0](https://img.shields.io/badge/Kafka%20%7C%20Spark%20%7C%20Delta--Lake-Apache%202.0-green)](https://www.apache.org/licenses/LICENSE-2.0)
 [![PostgreSQL License](https://img.shields.io/badge/PostgreSQL-License-blue)](https://opensource.org/licenses/postgresql)
--[![Docker Compose](https://img.shields.io/badge/Docker-Compose-v2.x-lightgrey?logo=docker)](https://docs.docker.com/compose/)
-+[![Docker Compose](https://img.shields.io/badge/Docker_Compose-v2.x-2496ED?logo=docker&logoColor=white)](https://docs.docker.com/compose/)
+[![Docker Compose](https://img.shields.io/badge/Docker_Compose-v2.x-2496ED?logo=docker&logoColor=white)](https://docs.docker.com/compose/)
 
 > **Kafka × Spark Structured Streaming × Delta Lake × PostgreSQL × AWS CloudWatch**
 > A fully-containerised data pipeline that ingests live market prices, enriches them in Spark, persists them in Delta Lake **and** PostgreSQL, and raises CloudWatch alerts when intraday price movements break configured thresholds.
